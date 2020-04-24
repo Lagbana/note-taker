@@ -40,7 +40,32 @@ app.get('/api/notes', async (req, res) => {
 app.get('*', (req, res) => res.redirect('/'))
 
 
+// Functions: Reading and Writing to Database (to POST and DELETE)
+// ====================================================================
+const readDB = async () => {
+    const result = await fs.readFile(dbpath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(err)
+            return
+        }
+        try {
+            return data
+        } catch (err) {
+            console.error(err)
+        }
+    });
+    return JSON.parse(result)
+}
 
+const writeToDB = async (file) => {
+
+    await fs.writeFile(dbpath, file, (err, data) => {
+        if (err) {
+            throw err;
+        }
+        return data;
+    });
+}
 
 // Server listening
 // ====================================================================
