@@ -84,6 +84,27 @@ app.post('/api/notes', async function (req, res) {
     res.json({ post: true })
 })
 
+// DELETE request route handling
+// =========================================================
+app.delete('/api/notes/:id', async function (req, res) {
+    const deletedNoteID = req.params.id
+    
+    const allNotes = await readDB()
+  
+    for (const note of allNotes) {
+      if (note.id === deletedNoteID) {
+          allNotes.splice(allNotes.indexOf(note), 1)
+      }
+    }
+
+    const updatedDB = JSON.stringify(allNotes)
+
+    await writeToDB(updatedDB)
+
+    res.json({ delete: true })
+
+})
+
 
 // Server listening
 // ====================================================================
