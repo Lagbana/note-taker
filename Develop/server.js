@@ -21,7 +21,7 @@ app.use(express.static(__dirname + '/public'))
 const dbDir = path.resolve(__dirname, "./db");
 const dbpath = path.join(dbDir, 'db.json')
 
-// GET requesting handling
+// GET request handling
 // ========================================================
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'))
@@ -66,6 +66,24 @@ const writeToDB = async (file) => {
         return data;
     });
 }
+
+// POST request handling
+// =========================================================
+
+app.post('/api/notes', async function (req, res) {
+    const newNote = req.body
+    newNote["id"] = uniqueID()
+
+    const allNotes = await readDB()
+    allNotes.push(newNote)
+
+    const updatedDB = JSON.stringify(allNotes)
+
+    writeToDB(updatedDB)
+
+    res.json({ post: true })
+})
+
 
 // Server listening
 // ====================================================================
