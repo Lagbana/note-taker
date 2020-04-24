@@ -21,14 +21,26 @@ app.use(express.static(__dirname + '/public'))
 const dbDir = path.resolve(__dirname, "./db");
 const dbpath = path.join(dbDir, 'db.json')
 
-// public route handling
-// =========================================================
+// GET requesting handling
+// ========================================================
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'))
 })
 app.get('/notes', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/notes.html'))
 })
+
+// JSON object of all notes
+app.get('/api/notes', async (req, res) => {
+    const result = await readDB()
+    return res.json(result)
+})
+
+// Redirect non-existent routes to the index page instead of displaying 404 status
+app.get('*', (req, res) => res.redirect('/'))
+
+
+
 
 // Server listening
 // ====================================================================
