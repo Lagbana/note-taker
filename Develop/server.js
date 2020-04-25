@@ -5,6 +5,9 @@ const path = require('path')
 const fs = require('fs').promises
 const { v4 } = require('uuid')
 const uniqueID = v4
+const moment = require('moment')
+const timeStamp = moment().format('LLL')
+const filterByTime = moment().format('YYYY-M-D')
 
 
 // Express App
@@ -30,10 +33,52 @@ app.get('/notes', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/notes.html'))
 })
 
-// JSON object of all notes
+// Get all notes in Database
 app.get('/api/notes', async (req, res) => {
     const result = await readDB()
     return res.json(result)
+})
+
+// Filter notes in Database by: YEAR only or YEAR/MONTH or YEAR/MONTH/DAY
+app.get('/api/notes/:year?/:month?/:day?', async (req, res) => {
+    // Read in database
+    const allNotes = await readDB()
+
+    // search parameters
+    const year = req.params.year
+    const month = req.params.month
+    const day = req.params.day
+
+    // output
+    const results = []
+
+    try {
+        for (const note of allNotes) {
+            const noteTime = note["filterTime"] // e.g: 2020-4-30
+            const arr = noteTime.split('-')
+            const apiYear = arr[0], apiMonth = arr[1], apiDay = arr[2]
+            
+            const hasYear = (apiYear === year)
+            const hasMonth = (apiMonth === month)
+            const hasDay = (apiDay === day)
+
+            if (hasYear && hasMonth && hasDay) {
+                results.push(note)
+            } else if (hasYear && hasMonth && day === undefined) {
+                results.push(note)
+            } else if (hasYear && month === undefined && day === undefined) {
+                results.push(note)
+            } 
+        }
+        if (results.length > 0) {
+            return res.json(results)
+        } else {
+            return res.json({"parameters":false})
+        }
+    } catch (err) {
+        console.log(err)
+    }
+
 })
 
 // Redirect non-existent routes to the index page instead of displaying 404 status
@@ -71,11 +116,24 @@ const writeToDB = async (file) => {
 // =========================================================
 
 app.post('/api/notes', async function (req, res) {
-    const newNote = req.body
-    newNote["id"] = uniqueID()
+    const newNoteObject = req.body
+
+    // add note id and time stamp at time of writing
+    newNoteObject["id"] = uniqueID()
+    newNoteObject["timeStamp"] = timeStamp
+    newNoteObject["filterTime"] = filterByTime
+
+    const newNoteText = newNoteObject["text"]
+
+    // Format note display structure and update with time of writing ------------------------------------------------------------------------------------------------------------------------>
+    newNoteObject["text"] = `                                                                                                                                                          Written: ${timeStamp} 
+    
+${newNoteText}
+    `
+
 
     const allNotes = await readDB()
-    allNotes.push(newNote)
+    allNotes.push(newNoteObject)
 
     const updatedDB = JSON.stringify(allNotes)
 
@@ -88,13 +146,13 @@ app.post('/api/notes', async function (req, res) {
 // =========================================================
 app.delete('/api/notes/:id', async function (req, res) {
     const deletedNoteID = req.params.id
-    
+
     const allNotes = await readDB()
-  
+
     for (const note of allNotes) {
-      if (note.id === deletedNoteID) {
-          allNotes.splice(allNotes.indexOf(note), 1)
-      }
+        if (note.id === deletedNoteID) {
+            allNotes.splice(allNotes.indexOf(note), 1)
+        }
     }
 
     const updatedDB = JSON.stringify(allNotes)

@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "moment": "^2.24.0",
     "path": "^0.12.7",
     "uuid": "^7.0.3"
   },
