@@ -6,11 +6,13 @@
 ## Description
 Note Taker App is an application that can be used to write, save, and delete notes. This application uses an express backend, saves and retrieve note data from a JSON file. A note is persistent on the front-end until the user deletes it.
 
-## Table of Contents
+> View Live Project:   
+> [`Note Taker App`](https://agile-forest-57803.herokuapp.com/)
 
-* [Installation](#installation)
-* [Usage](#usage)
-* [License](#license)
+### Objective
+* Create server-side API using the Express.js framework.
+* Configure Express.js app to handle GET and POST requests and server static files
+* Parse optional and required parameters when creating server-side routes
 
 ## Installation
  - Install node: [NodeJS](https://nodejs.org/en/download/)
@@ -18,7 +20,9 @@ Note Taker App is an application that can be used to write, save, and delete not
  - Initiate server start up `nodemon server`
 
 ## Usage
-Examples coming soon... 
+Create, save, and delete note
+
+![note-taker](/resources/note-taker.gif)
 
 ## License
 Licensed under the [MIT](https://choosealicense.com/licenses/mit/) license.
